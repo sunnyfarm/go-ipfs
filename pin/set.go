@@ -299,12 +299,25 @@ func storeSet(ctx context.Context, dag merkledag.DAGService, keys []util.Key, in
 
 func storeMultiset(ctx context.Context, dag merkledag.DAGService, refcounts map[util.Key]uint64, internalKeys keyObserver) (*merkledag.Node, error) {
 	iter := func() (k util.Key, data []byte, ok bool) {
+		// Every call of this function returns the next refcount item.
+		//
+		// This function splits out the uint64 reference counts as
+		// smaller increments, as fits in type refcount. Most of the
+		// time the refcount will fit inside just one, so this saves
+		// space.
+		//
+		// We use range here to pick an arbitrary item in the map, but
+		// not really iterate the map.
 		for k, refs := range refcounts {
 			num := ^refcount(0)
 			if refs <= uint64(num) {
+				// Remaining count fits in a single item; remove the
+				// key from the map.
 				num = refcount(refs)
 				delete(refcounts, k)
 			} else {
+				// Count is too large to fit in one item, the key will
+				// repeat in some later call.
 				refcounts[k] -= uint64(num)
 			}
 			return k, num.Bytes(), true
