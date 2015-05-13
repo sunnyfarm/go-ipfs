@@ -251,9 +251,6 @@ func loadSet(ctx context.Context, dag merkledag.DAGService, root *merkledag.Node
 	if err := walkItems(ctx, dag, n, walk, internalKeys); err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	return res, nil
 }
 
