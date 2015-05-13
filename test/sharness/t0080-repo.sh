@@ -80,7 +80,7 @@ test_expect_success "remove direct pin" '
 test_expect_success "'ipfs repo gc' removes file" '
 	ipfs repo gc >actual7 &&
 	echo "removed $HASH" >expected7 &&
-	test_includes_lines actual7 expected7
+	test_includes_lines expected7 actual7
 '
 
 # TODO: there seems to be a serious bug with leveldb not returning a key.
