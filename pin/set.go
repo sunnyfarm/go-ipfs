@@ -210,7 +210,7 @@ func walkItems(ctx context.Context, dag merkledag.DAGService, n *merkledag.Node,
 		return err
 	}
 	// readHdr guarantees fanout is a safe value
-	fanout := int(hdr.GetFanout())
+	fanout := hdr.GetFanout()
 	for i, l := range n.Links[fanout:] {
 		if err := fn(buf, i, l); err != nil {
 			return err
