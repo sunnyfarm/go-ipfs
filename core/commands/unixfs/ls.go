@@ -78,7 +78,7 @@ directories, the child size is the IPFS link size.
 				return
 			}
 
-			output[i] = &LsObject{}
+			output[i] = &LsObject{Argument: paths[i]}
 
 			t := unixFSNode.GetType()
 			switch t {
@@ -98,7 +98,6 @@ directories, the child size is the IPFS link size.
 					Size: unixFSNode.GetFilesize(),
 				}}
 			case unixfspb.Data_Directory:
-				output[i].Argument = paths[i]
 				output[i].Links = make([]LsLink, len(merkleNode.Links))
 				for j, link := range merkleNode.Links {
 					link.Node, err = link.GetNode(ctx, node.DAG)
@@ -137,7 +136,9 @@ directories, the child size is the IPFS link size.
 			w := tabwriter.NewWriter(buf, 1, 2, 1, ' ', 0)
 			lastObjectDirHeader := false
 			for i, object := range output.Objects {
-				if len(output.Objects) > 1 && object.Argument != "" {
+				singleObject := (len(object.Links) == 1 &&
+					object.Links[0].Name == object.Argument)
+				if len(output.Objects) > 1 && !singleObject {
 					if i > 0 {
 						fmt.Fprintln(w)
 					}
